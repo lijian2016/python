@@ -6,7 +6,7 @@ import datetime
 from requests import Session
 import time
 
-
+# hhw
 random.seed(datetime.datetime.now())
 baseUrl = "https://baike.baidu.com"
 his = ["/item/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/5162711"]
