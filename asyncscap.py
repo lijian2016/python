@@ -24,6 +24,8 @@ def parse(html):
 unseen = set([base_url,])
 seen = set()
 count = 0
+
+pool = mp.Pool(8)
 async def main(loop):
     global  count
     async with aiohttp.ClientSession() as session:
@@ -35,14 +37,17 @@ async def main(loop):
             unseen.clear()
 
             htmls = [j.result() for j in finished]
-            for html in htmls:
-                title, page_urls, url = parse(html)
+            parse_jobs = [pool.apply_async(parse,args=(html,)) for html in htmls]
+            results = [j.get() for j in parse_jobs]
+            for title, page_urls, url in results:
                 unseen.update(page_urls-seen)
                 count += 1
                 print(count ,"    ",title, "   ", url)
-start = time.time()
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main(loop))
-loop.close()
-end = time.time()
-print(end-start)
+
+if __name__=="__main__":
+    start = time.time()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main(loop))
+    loop.close()
+    end = time.time()
+    print(end-start)
